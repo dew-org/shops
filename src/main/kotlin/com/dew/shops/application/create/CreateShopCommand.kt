@@ -1,7 +1,9 @@
 package com.dew.shops.application.create
 
+import com.dew.common.domain.bus.Request
 import io.micronaut.core.annotation.Introspected
 import io.micronaut.core.annotation.ReflectiveAccess
+import org.reactivestreams.Publisher
 import javax.validation.constraints.NotBlank
 
 @Introspected
@@ -23,4 +25,4 @@ data class CreateShopCommand(
     val userId: String,
 
     val email: String? = null,
-)
+) : Request<Publisher<Boolean>>

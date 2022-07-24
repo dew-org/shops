@@ -1,5 +1,6 @@
 package com.dew
 
+import com.dew.common.domain.bus.Mediator
 import com.dew.shops.application.ShopService
 import com.dew.shops.application.create.CreateShopCommand
 import io.micronaut.http.HttpStatus
@@ -12,11 +13,11 @@ import javax.validation.Valid
 
 @Controller("/shops")
 @Secured(SecurityRule.IS_AUTHENTICATED)
-open class ShopController(private val shopService: ShopService) {
+open class ShopController(private val mediator: Mediator) {
 
     @Post
     open fun save(@Valid command: CreateShopCommand): Mono<HttpStatus> {
-        return shopService.save(command)
+        return Mono.from(mediator.send(command))
             .map { added: Boolean -> if (added) HttpStatus.CREATED else HttpStatus.CONFLICT }
     }
 }
