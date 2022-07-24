@@ -8,8 +8,6 @@ import jakarta.inject.Inject
 import org.testcontainers.containers.MongoDBContainer
 import org.testcontainers.spock.Testcontainers
 import org.testcontainers.utility.DockerImageName
-import spock.lang.AutoCleanup
-import spock.lang.Shared
 import spock.lang.Specification
 
 @MicronautTest
@@ -30,6 +28,16 @@ class ShopControllerSpec extends Specification implements TestPropertyProvider {
 
         then: 'the shop is saved'
         status == HttpStatus.CREATED
+
+        when: 'search for a shop by user id'
+        var response = client.findByUserId("asda23")
+
+        then: 'the shop is found'
+        response.status == HttpStatus.OK
+        response.body.present
+
+        response.body().name == "Dew"
+
     }
 
     @Override
