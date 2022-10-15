@@ -82,3 +82,47 @@ jobs:
 
       - name: upload coverage report
         uses: codecov/codecov-action@v1
+  publish:
+
+    if: github.event_name == 'release'
+
+    needs: [ build ]
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            ~/.m2/repository
+          key: ${{ runner.os }}-gradle-test-${{ hashFiles('**/*.gradle') }}
+          restore-keys: ${{ runner.os }}-gradle-test-
+
+      - uses: actions/download-artifact@v2
+        with:
+          name: build
+          path: build
+
+      - name: log into registry ${{ env.REGISTRY }}
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: build and push docker image
+        env:
+          USERNAME: cantte
+          TOKEN: ${{ github.token }}
+          TESTCONTAINERS_RYUK_DISABLED: true
+        run: |
+          ./gradlew check dockerPush --no-daemon
