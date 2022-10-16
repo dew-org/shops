@@ -3,4 +3,9 @@ micronaut:
     name: shops
   config-client:
     enabled: true
-consul.client.defaultZone: ${CONSUL_HOST:localhost}:${CONSUL_PORT:8500}
+consul:
+  client:
+    registration:
+      enabled: false
+    config:
+      enabled: false
